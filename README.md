@@ -64,5 +64,6 @@ pip install -r requirements.txt
 ```
 
 ## Deploy the Web Application
+```bash 
 gcloud run deploy --source .
-
+```

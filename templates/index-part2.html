@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Cloud Lab | AI Content Analyzer</title>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script> <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Roboto:wght@300;400;500&display=swap');
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f8f9fa;
+            overflow-x: hidden;
+        }
+
+        h1,
+        h2,
+        h3,
+        .google-font {
+            font-family: 'Google Sans', sans-serif;
+        }
+
+        .btn-google {
+            background-color: #1a73e8;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn-google:hover {
+            background-color: #1765cc;
+            box-shadow: 0 4px 12px rgba(66, 133, 244, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .card {
+            background: white;
+            border: 1px solid #dadce0;
+            border-radius: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .input-field {
+            border: 1px solid #dadce0;
+            transition: all 0.2s ease;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #1a73e8;
+            box-shadow: 0 0 0 4px rgba(26, 115, 232, 0.1);
+        }
+
+        /* Segmented Control Styling */
+        .tab-indicator {
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Wave Animation for Header Bars */
+        @keyframes wave {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .animate-wave {
+            animation: wave 1.2s ease-in-out infinite;
+        }
+
+        /* Entrance Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-15px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fade-up {
+            animation: fadeInUp 0.5s ease-out forwards;
+        }
+
+        .animate-fade-down {
+            animation: fadeInDown 0.5s ease-out forwards;
+        }
+
+        /* Loading Animation */
+        .dot-flashing {
+            position: relative;
+            width: 10px;
+            height: 10px;
+            border-radius: 5px;
+            background-color: #1a73e8;
+            animation: dot-flashing 1s infinite linear alternate;
+        }
+
+        .dot-flashing::before,
+        .dot-flashing::after {
+            content: '';
+            display: inline-block;
+            position: absolute;
+            top: 0;
+            width: 10px;
+            height: 10px;
+            border-radius: 5px;
+            background-color: #1a73e8;
+            animation: dot-flashing 1s infinite alternate;
+        }
+
+        .dot-flashing::before {
+            left: -15px;
+            animation-delay: 0s;
+        }
+
+        .dot-flashing::after {
+            left: 15px;
+            animation-delay: 1s;
+        }
+
+        @keyframes dot-flashing {
+            0% {
+                background-color: #1a73e8;
+            }
+
+            50%,
+            100% {
+                background-color: #ebebed;
+            }
+        }
+
+        .dropzone {
+            border: 2px dashed #dadce0;
+            transition: all 0.3s ease;
+        }
+
+        .dropzone.dragover {
+            border-color: #1a73e8;
+            background-color: rgba(26, 115, 232, 0.05);
+        }
+    </style>
+</head>
+
+<body class="min-h-screen flex flex-col bg-[#f8f9fa]">
+
+    <!-- Header -->
+    <header
+        class="bg-white/80 backdrop-blur-md border-b border-gray-200 px-6 py-4 flex items-center justify-between sticky top-0 z-50 animate-fade-down">
+        <div class="flex items-center space-x-4">
+            <div class="flex space-x-1 items-end h-8">
+                <span class="w-2 h-5 bg-[#4285F4] rounded-full animate-wave" style="animation-delay: 0.0s"></span>
+                <span class="w-2 h-5 bg-[#EA4335] rounded-full animate-wave" style="animation-delay: 0.1s"></span>
+                <span class="w-2 h-5 bg-[#FBBC04] rounded-full animate-wave" style="animation-delay: 0.2s"></span>
+                <span class="w-2 h-5 bg-[#34A853] rounded-full animate-wave" style="animation-delay: 0.3s"></span>
+            </div>
+            <h1 class="text-xl font-medium text-gray-700">
+                Google Cloud <span class="text-gray-400 font-light mx-1">|</span> Intelligence Lab
+            </h1>
+        </div>
+        <div class="hidden md:flex items-center space-x-4 text-sm text-gray-600">
+            <span class="flex items-center gap-2 px-3 py-1 bg-gray-100 rounded-full font-medium">
+                <i data-lucide="user" class="w-4 h-4 text-blue-600"></i>
+                Mahmoud Elnagar
+            </span>
+            <div
+                class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold cursor-default">
+                M</div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow flex flex-col items-center justify-start p-4 md:p-12">
+        <div class="max-w-2xl w-full">
+
+            <div class="mb-10 text-center animate-fade-up">
+                <h2 class="text-4xl font-bold text-gray-900 mb-3 tracking-tight">AI Content Analyzer</h2>
+                <p class="text-gray-500 font-medium">Powered by Gemini 2.0 Flash</p>
+            </div>
+
+            <!-- Enhanced Analyzer Card -->
+            <div class="card shadow-lg opacity-0 animate-fade-up" style="animation-delay: 0.1s">
+
+                <!-- Custom Switcher -->
+                <div class="p-2 border-b border-gray-100 bg-gray-50/50 flex items-center justify-center rounded-t-2xl">
+                    <div class="relative flex bg-gray-200 rounded-full p-1 w-full max-w-sm overflow-hidden">
+                        <!-- Tab Indicator -->
+                        <div id="tabIndicator"
+                            class="absolute h-9 w-[49%] bg-white rounded-full shadow-sm tab-indicator transform translate-x-0">
+                        </div>
+
+                        <button onclick="switchInput('url')"
+                            class="relative z-10 w-1/2 py-2 text-sm font-medium transition-colors text-blue-700"
+                            id="btnUrl">
+                            YouTube URL
+                        </button>
+                        <button onclick="switchInput('file')"
+                            class="relative z-10 w-1/2 py-2 text-sm font-medium transition-colors text-gray-600"
+                            id="btnFile">
+                            Local File
+                        </button>
+                    </div>
+                </div>
+
+                <form id="analyzerForm" action="/analyze" method="POST" enctype="multipart/form-data"
+                    class="p-8 space-y-8">
+                    <!-- Dynamic Input Area -->
+                    <div class="min-h-[120px] relative">
+                        <!-- URL Input -->
+                        <div id="urlInputGroup" class="space-y-3 transition-all duration-300">
+                            <label class="block text-sm font-bold text-gray-700">Video Content URL</label>
+                            <div class="relative">
+                                <div
+                                    class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-red-500">
+                                    <i data-lucide="youtube" class="w-6 h-6"></i>
+                                </div>
+                                <input type="text" name="youtube_link"
+                                    placeholder="Paste your YouTube video link here..."
+                                    class="input-field w-full pl-12 pr-4 py-4 rounded-xl text-lg">
+                            </div>
+                        </div>
+
+                        <!-- File Input (Hidden by default) -->
+                        <div id="fileInputGroup" class="hidden space-y-3 transition-all duration-300">
+                            <label class="block text-sm font-bold text-gray-700">Document or Video File</label>
+                            <div id="dropzone"
+                                class="dropzone rounded-xl p-8 flex flex-col items-center justify-center cursor-pointer group">
+                                <div
+                                    class="w-12 h-12 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                                    <i data-lucide="cloud-upload" class="w-6 h-6"></i>
+                                </div>
+                                <p class="text-sm font-medium text-gray-600">Drag and drop file or <span
+                                        class="text-blue-600 underline">browse</span></p>
+                                <p class="text-xs text-gray-400 mt-1">PDF, MP4, MOV (Max 50MB)</p>
+                                <input type="file" name="file" class="hidden" id="fileInput">
+                            </div>
+                            <div id="fileSelectionName"
+                                class="hidden text-xs text-blue-600 font-medium flex items-center gap-2 px-2">
+                                <i data-lucide="file-check" class="w-3 h-3"></i>
+                                <span id="fileName">No file selected</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mode Selection Tiles -->
+                    <div class="space-y-3">
+                        <label class="block text-sm font-bold text-gray-700">Analysis Mode</label>
+                        <div class="grid grid-cols-3 gap-4">
+                            <label
+                                class="relative flex flex-col items-center p-4 rounded-xl border-2 border-gray-100 cursor-pointer hover:bg-blue-50/50 transition-all"
+                                id="mode-summary">
+                                <input type="radio" name="mode" value="summary" checked class="hidden peer"
+                                    onchange="updateModeUI()">
+                                <i data-lucide="align-left"
+                                    class="w-6 h-6 mb-2 text-gray-400 peer-checked:text-blue-600"></i>
+                                <span
+                                    class="text-xs font-bold text-gray-500 peer-checked:text-blue-700 uppercase">Summary</span>
+                                <div
+                                    class="absolute inset-0 border-2 border-transparent peer-checked:border-blue-500 rounded-xl transition-all">
+                                </div>
+                            </label>
+
+                            <label
+                                class="relative flex flex-col items-center p-4 rounded-xl border-2 border-gray-100 cursor-pointer hover:bg-blue-50/50 transition-all"
+                                id="mode-keypoints">
+                                <input type="radio" name="mode" value="keypoints" class="hidden peer"
+                                    onchange="updateModeUI()">
+                                <i data-lucide="list-checks"
+                                    class="w-6 h-6 mb-2 text-gray-400 peer-checked:text-blue-600"></i>
+                                <span
+                                    class="text-xs font-bold text-gray-500 peer-checked:text-blue-700 uppercase">Highlights</span>
+                                <div
+                                    class="absolute inset-0 border-2 border-transparent peer-checked:border-blue-500 rounded-xl transition-all">
+                                </div>
+                            </label>
+
+                            <label
+                                class="relative flex flex-col items-center p-4 rounded-xl border-2 border-gray-100 cursor-pointer hover:bg-blue-50/50 transition-all"
+                                id="mode-chat">
+                                <input type="radio" name="mode" value="chat" class="hidden peer"
+                                    onchange="updateModeUI()">
+                                <i data-lucide="message-square"
+                                    class="w-6 h-6 mb-2 text-gray-400 peer-checked:text-blue-600"></i>
+                                <span class="text-xs font-bold text-gray-500 peer-checked:text-blue-700 uppercase">AI
+                                    Chat</span>
+                                <div
+                                    class="absolute inset-0 border-2 border-transparent peer-checked:border-blue-500 rounded-xl transition-all">
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Chat Area -->
+                    <div id="chatInterface"
+                        class="hidden space-y-3 opacity-0 transform translate-y-4 transition-all duration-300">
+                        <div class="flex items-center gap-2">
+                            <span class="flex-grow h-[1px] bg-gray-100"></span>
+                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Question
+                                Workspace</span>
+                            <span class="flex-grow h-[1px] bg-gray-100"></span>
+                        </div>
+                        <div class="relative bg-gray-50 rounded-2xl p-4 border border-blue-100">
+                            <textarea name="question" rows="2" placeholder="Ask the AI something about the file..."
+                                class="w-full bg-transparent resize-none focus:outline-none text-gray-700 text-sm"></textarea>
+                            <div class="flex justify-end mt-2">
+                                <span class="text-[10px] text-gray-400">Context: Active File/Video</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Submit -->
+                    <button type="submit"
+                        class="btn-google w-full text-white font-bold py-5 rounded-2xl flex items-center justify-center gap-3 shadow-md group">
+                        <i data-lucide="zap" class="w-6 h-6 fill-current"></i>
+                        <span>Begin Intelligence Analysis</span>
+                        <i data-lucide="chevron-right"
+                            class="w-5 h-5 group-hover:translate-x-1 transition-transform"></i>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Features -->
+            <div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6 opacity-0 animate-fade-up"
+                style="animation-delay: 0.3s">
+                <div class="flex items-center gap-4 p-4 rounded-xl bg-white border border-gray-100">
+                    <div
+                        class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center flex-shrink-0">
+                        <i data-lucide="globe" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-bold text-gray-800">Global Reach</h4>
+                        <p class="text-xs text-gray-500">Supports multi-language content</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4 p-4 rounded-xl bg-white border border-gray-100">
+                    <div
+                        class="w-10 h-10 rounded-full bg-green-100 text-green-600 flex items-center justify-center flex-shrink-0">
+                        <i data-lucide="shield-check" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-bold text-gray-800">Secure Processing</h4>
+                        <p class="text-xs text-gray-500">Private Lab Environment</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4 p-4 rounded-xl bg-white border border-gray-100">
+                    <div
+                        class="w-10 h-10 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center flex-shrink-0">
+                        <i data-lucide="hard-drive" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-bold text-gray-800">Auto-Index</h4>
+                        <p class="text-xs text-gray-500">Instant PDF parsing</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analysis Output -->
+            <div id="outputSection" class="mt-12 hidden animate-fade-up">
+                <div class="flex items-center gap-3 mb-6">
+                    <h3 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+                        <i data-lucide="layout" class="text-blue-600"></i> Analysis Dashboard
+                    </h3>
+                </div>
+                <div class="card p-8 bg-white border-2 border-blue-50">
+                    <div id="aiResponse" class="prose prose-blue max-w-none text-gray-700 space-y-4"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Fullscreen Loader -->
+    <div id="loadingOverlay"
+        class="fixed inset-0 bg-white/90 backdrop-blur-xl hidden flex-col items-center justify-center z-[100] transition-opacity duration-300">
+        <div class="dot-flashing mb-10"></div>
+        <div class="text-center">
+            <h3 class="google-font text-2xl font-bold text-gray-800 mb-2">Vertex AI Reasoning...</h3>
+            <p class="text-gray-500 max-w-xs mx-auto text-sm">Our models are analyzing the multimodal tokens for deep
+                insights.</p>
+        </div>
+        <div class="mt-10 flex gap-1 animate-pulse">
+            <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+            <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>
+            <span class="w-1.5 h-1.5 rounded-full bg-yellow-500"></span>
+            <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+        </div>
+    </div>
+
+    <footer class="p-10 text-center border-t border-gray-100 mt-auto bg-white">
+        <p class="text-gray-400 text-xs font-medium uppercase tracking-[0.2em]">&copy; 2026 Mahmoud Elnagar | Google
+            Cloud Workshop</p>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+
+        const tabIndicator = document.getElementById('tabIndicator');
+        const urlGroup = document.getElementById('urlInputGroup');
+        const fileGroup = document.getElementById('fileInputGroup');
+        const btnUrl = document.getElementById('btnUrl');
+        const btnFile = document.getElementById('btnFile');
+        const chatInterface = document.getElementById('chatInterface');
+        const dropzone = document.getElementById('dropzone');
+        const fileInput = document.getElementById('fileInput');
+        const fileNameDisplay = document.getElementById('fileName');
+        const fileInfo = document.getElementById('fileSelectionName');
+
+        // Fixed Input Switcher Logic
+        function switchInput(type) {
+            if (type === 'url') {
+                // Update Tab Indicator
+                tabIndicator.style.transform = 'translateX(0)';
+
+                // Update Button Text Colors
+                btnUrl.classList.add('text-blue-700');
+                btnUrl.classList.remove('text-gray-600');
+                btnFile.classList.add('text-gray-600');
+                btnFile.classList.remove('text-blue-700');
+
+                // Toggle Content
+                urlGroup.classList.remove('hidden');
+                fileGroup.classList.add('hidden');
+            } else {
+                // Update Tab Indicator - Move to right side
+                tabIndicator.style.transform = 'translateX(102%)';
+
+                // Update Button Text Colors
+                btnFile.classList.add('text-blue-700');
+                btnFile.classList.remove('text-gray-600');
+                btnUrl.classList.add('text-gray-600');
+                btnUrl.classList.remove('text-blue-700');
+
+                // Toggle Content
+                fileGroup.classList.remove('hidden');
+                urlGroup.classList.add('hidden');
+            }
+        }
+
+        function updateModeUI() {
+            const selectedMode = document.querySelector('input[name="mode"]:checked').value;
+            if (selectedMode === 'chat') {
+                chatInterface.classList.remove('hidden');
+                setTimeout(() => chatInterface.classList.remove('opacity-0', 'translate-y-4'), 10);
+            } else {
+                chatInterface.classList.add('opacity-0', 'translate-y-4');
+                setTimeout(() => chatInterface.classList.add('hidden'), 300);
+            }
+        }
+
+        dropzone.addEventListener('click', () => fileInput.click());
+        dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('dragover'); });
+        dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
+        dropzone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropzone.classList.remove('dragover');
+            if (e.dataTransfer.files.length) {
+                fileInput.files = e.dataTransfer.files;
+                handleFileSelect();
+            }
+        });
+
+        fileInput.onchange = handleFileSelect;
+
+        function handleFileSelect() {
+            if (fileInput.files.length) {
+                fileNameDisplay.innerText = fileInput.files[0].name;
+                fileInfo.classList.remove('hidden');
+            }
+        }
+
+        const form = document.getElementById('analyzerForm');
+        const loading = document.getElementById('loadingOverlay');
+        const output = document.getElementById('outputSection');
+        const response = document.getElementById('aiResponse');
+        form.onsubmit = async (e) => {
+
+            e.preventDefault();
+
+            loading.classList.remove('hidden');
+            loading.classList.add('flex');
+
+            const formData = new FormData(form);
+
+            try {
+
+                const res = await fetch("/analyze", {
+                    method: "POST",
+                    body: formData
+                });
+
+                const data = await res.text();
+
+                loading.classList.add('hidden');
+
+                output.classList.remove('hidden');
+
+                response.innerHTML = `
+            <div class="prose max-w-none">
+                ${data}
+            </div>
+        `;
+
+                window.scrollTo({ top: output.offsetTop - 100, behavior: 'smooth' });
+
+            } catch (err) {
+
+                loading.classList.add('hidden');
+
+                response.innerHTML = `
+        <p class="text-red-500">Error processing request</p>
+        `;
+            }
+        };
+    </script>
+</body>
+
+</html>

@@ -8,7 +8,7 @@ from youtube_transcript_api import YouTubeTranscriptApi
 import markdown
 app = Flask(__name__)
 
-PROJECT_ID = "gemini-powered-489000"
+PROJECT_ID = "REPLACE_WITH_YOUR_ID"
 UPLOAD_FOLDER = "uploads"
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -113,7 +113,7 @@ def analyze():
     youtube_link = request.form.get("youtube_link")
     question = request.form.get("question")
     mode = request.form.get("mode")
-    model = "gemini-2.0-flash-001"
+    model = "gemini-2.0-flash"
 
     uploaded_file = request.files.get("file")
 
